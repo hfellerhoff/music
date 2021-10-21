@@ -10,13 +10,13 @@
 	} from 'carbon-components-svelte';
 </script>
 
-<Header company="Create by" platformName="Modern.fm">
+<Header company="Henry Fellerhoff" platformName="Music">
 	<HeaderUtilities>
 		<HeaderAction transition={{ duration: 200 }}>
 			<HeaderPanelLinks>
 				<HeaderPanelDivider>Music Creation Tools</HeaderPanelDivider>
 				<HeaderPanelLink href="/sequencer">Sequencer</HeaderPanelLink>
-				<HeaderPanelDivider>Sample Packs by Modern.fm</HeaderPanelDivider>
+				<!-- <HeaderPanelDivider>Sample Packs by Modern.fm</HeaderPanelDivider>
 				<HeaderPanelLink
 					target="_blank"
 					rel="noopener noreferrer"
@@ -35,7 +35,7 @@
 				<HeaderPanelDivider>Modern.fm Community</HeaderPanelDivider>
 				<HeaderPanelLink target="_blank" rel="noopener noreferrer" href="https://discord.gg/AuHucr9"
 					>Join Discord</HeaderPanelLink
-				>
+				> -->
 			</HeaderPanelLinks>
 		</HeaderAction>
 	</HeaderUtilities>

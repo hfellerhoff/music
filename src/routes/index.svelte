@@ -1,9 +1,5 @@
 <script>
 	import { ClickableTile } from 'carbon-components-svelte';
-
-	Array(5 * 4)
-		.fill(0)
-		.forEach((item) => console.log(item));
 </script>
 
 <svelte:head>
