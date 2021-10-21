@@ -3,7 +3,7 @@
 </script>
 
 <svelte:head>
-	<title>Create by Modern.fm</title>
+	<title>Create Music | Henry Fellerhoff</title>
 </svelte:head>
 
 <ClickableTile href="/sequencer" style="padding: 2rem;">

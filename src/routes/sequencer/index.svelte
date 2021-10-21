@@ -174,7 +174,7 @@
 {/if}
 
 <svelte:head>
-	<title>Sequencer | Create by Modern.fm</title>
+	<title>Sequencer | Henry Fellerhoff</title>
 </svelte:head>
 
 <h2>Sequencer</h2>
