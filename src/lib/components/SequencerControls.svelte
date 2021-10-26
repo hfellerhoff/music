@@ -1,9 +1,20 @@
 <script lang="ts">
-	import { resetSequencerControls, sequencer } from '$lib/state/sequencer';
+	import { initSequencer, sequencer } from '$lib/state/sequencer';
 
-	import { Select, SelectItem, NumberInput, Checkbox, Button } from 'carbon-components-svelte';
+	import {
+		Select,
+		SelectItem,
+		NumberInput,
+		Checkbox,
+		Button,
+		ButtonSet
+	} from 'carbon-components-svelte';
 	import Instrument from './Instrument.svelte';
 	import { Scale } from 'theory.js';
+
+	import Save16 from 'carbon-icons-svelte/lib/Save16';
+	import Reset16 from 'carbon-icons-svelte/lib/Reset16';
+	import FolderOpen16 from 'carbon-icons-svelte/lib/FolderOpen16';
 
 	let tonic = 'C';
 	let octave = 3;
@@ -14,9 +25,51 @@
 	};
 
 	$: $sequencer.tonic = `${tonic}${octave}`;
+
+	const loadSequencer = (): void => {
+		$sequencer.isLoaded = false;
+		const localSequencer = localStorage.getItem('sequencer');
+		if (localSequencer) {
+			sequencer.set({
+				...JSON.parse(localSequencer),
+				isLoaded: true
+			});
+		} else {
+			sequencer.update((value) => ({
+				...value,
+				isLoaded: true
+			}));
+		}
+	};
+	const saveSequencer = (): void => {
+		localStorage.sequencer = JSON.stringify($sequencer);
+	};
+	const resetAll = () => {
+		initSequencer();
+		tonic = 'C';
+		octave = 3;
+	};
 </script>
 
 <div class="sequencer-controls">
+	<Button iconDescription="Save Project" icon={Save16} on:click={saveSequencer}>Save Project</Button
+	>
+	<Button
+		iconDescription="Load Project"
+		icon={FolderOpen16}
+		on:click={loadSequencer}
+		kind="secondary">Load Project</Button
+	>
+	<Button iconDescription="Reset All" icon={Reset16} kind="ghost" on:click={resetAll}
+		>Reset All</Button
+	>
+	<div class="center-checkbox">
+		<Checkbox
+			labelText="Highlight Measure Start"
+			checked={$sequencer.highlightMeasureStart}
+			on:change={() => ($sequencer.highlightMeasureStart = !$sequencer.highlightMeasureStart)}
+		/>
+	</div>
 	<Select labelText="Tonic" selected={'C'} on:change={(e) => changeTonic(e.detail)}>
 		<SelectItem value={'C'} text={'C'} />
 		<SelectItem value={'C#'} text={'C#'} />
@@ -76,15 +129,6 @@
 		min={1}
 		max={8}
 	/>
-
-	<div class="center-checkbox">
-		<Checkbox
-			labelText="Highlight Measure Start"
-			checked={true}
-			on:change={() => ($sequencer.highlightMeasureStart = !$sequencer.highlightMeasureStart)}
-		/>
-	</div>
-	<Button kind="ghost" on:click={resetSequencerControls}>Reset to Defaults</Button>
 </div>
 
 <style>
@@ -100,7 +144,7 @@
 	}
 
 	.center-checkbox {
-		padding-top: 1.5rem;
+		/* padding-top: 1.5rem; */
 		display: flex;
 		align-items: center;
 		justify-content: center;

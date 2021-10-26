@@ -2,28 +2,19 @@
 	import { onMount } from 'svelte';
 	import * as Tone from 'tone';
 	import FileSaver from 'file-saver';
-	import { Note, Scale, Song } from 'theory.js';
-	import { Button, ClickableTile, Loading, ToastNotification } from 'carbon-components-svelte';
+	import { Note, Song } from 'theory.js';
+	import { Button, ButtonSet, Loading, ToastNotification } from 'carbon-components-svelte';
 
 	import { createInstruments, instruments } from '$lib/state/instruments';
 	import SequencerControls from '$lib/components/SequencerControls.svelte';
-	import { initSequencer, sequencer } from '$lib/state/sequencer';
+	import { sequencer, initSequencer } from '$lib/state/sequencer';
 	import { SequencerUtils } from '$lib/util/sequencer';
 
-	// let lowerTonic = new Note($sequencer.tonic);
-	// lowerTonic.lowerOctave();
-	// let lowerScale = new Scale(lowerTonic, $sequencer.scale);
+	import Play16 from 'carbon-icons-svelte/lib/Play16';
+	import Erase16 from 'carbon-icons-svelte/lib/Erase16';
+	import Export16 from 'carbon-icons-svelte/lib/Export16';
 
-	// let higherTonic = new Note($sequencer.tonic);
-	// higherTonic.raiseOctave();
-	// let higherScale = new Scale(higherTonic, $sequencer.scale);
-
-	$sequencer.activeTiles = {};
 	let changedTiles = {};
-
-	let scale = SequencerUtils.getScale($sequencer.tonic, $sequencer.scale, $sequencer.octaves);
-	$sequencer.columns = SequencerUtils.getColumns($sequencer.measures);
-	$sequencer.rows = SequencerUtils.getRows(scale);
 
 	const refreshActiveTiles = () => {
 		const previousActiveTiles = { ...$sequencer.activeTiles };
@@ -84,7 +75,7 @@
 			$sequencer.columns.forEach((column) => {
 				$sequencer.rows.forEach((row) => {
 					if ($sequencer.activeTiles[column][row]) {
-						const note = scale[row];
+						const note = $sequencer.stringScale[row];
 						synth.triggerAttackRelease(note, '16n', now + column / 4);
 					}
 				});
@@ -107,6 +98,7 @@
 		}
 	};
 
+	let isMounted = false;
 	onMount(() => {
 		initSequencer();
 
@@ -120,7 +112,7 @@
 			changedTiles = {};
 			$sequencer.columns.forEach((column) => {
 				changedTiles[column] = {};
-				scale.forEach((note) => {
+				$sequencer.stringScale.forEach((note) => {
 					changedTiles[column][note] = false;
 				});
 			});
@@ -129,6 +121,8 @@
 			isMouseDown = false;
 			mouseDownOnActiveTile = undefined;
 		});
+
+		isMounted = true;
 	});
 
 	const exportSong = async () => {
@@ -140,7 +134,7 @@
 			let activeNotes: Note[] = [];
 			Object.entries(rows).forEach(([row, isActive]) => {
 				if (isActive) {
-					const note = scale[row];
+					const note = $sequencer.stringScale[row];
 					activeNotes.push(new Note(note));
 				}
 			});
@@ -149,8 +143,6 @@
 			const measures = Math.floor(i / 4);
 			song.playNotes(activeNotes, '4n', [measures, beats, 0]);
 		});
-
-		// console.log(song.events.map((e) => `${e.type} ${e.location.toString()}`));
 
 		const midi = song.toMIDI();
 
@@ -162,13 +154,14 @@
 		});
 	};
 
-	const activeColor = '#f4f4f4';
-	const playingColor = '#1062FE';
-
 	$: {
-		scale = SequencerUtils.getScale($sequencer.tonic, $sequencer.scale, $sequencer.octaves);
+		$sequencer.stringScale = SequencerUtils.getScale(
+			$sequencer.tonic,
+			$sequencer.scale,
+			$sequencer.octaves
+		);
 		$sequencer.columns = SequencerUtils.getColumns($sequencer.measures);
-		$sequencer.rows = SequencerUtils.getRows(scale);
+		$sequencer.rows = SequencerUtils.getRows($sequencer.stringScale);
 
 		refreshActiveTiles();
 	}
@@ -192,7 +185,7 @@
 		>
 			{#each $sequencer.rows as row}
 				<div class="sequencer-label">
-					<h6>{scale[row]}</h6>
+					<h6>{$sequencer.stringScale[row]}</h6>
 				</div>
 				{#each $sequencer.columns as column}
 					<div
@@ -211,9 +204,9 @@
 			{/each}
 		</div>
 		<div class="button-container">
-			<Button kind="secondary" on:click={clearActiveTiles}>Clear</Button>
-			<Button on:click={playSong} disabled={playing}>Play</Button>
-			<Button kind="ghost" on:click={exportSong}>Export to MIDI</Button>
+			<Button icon={Play16} on:click={playSong} disabled={playing}>Play</Button>
+			<Button icon={Erase16} kind="secondary" on:click={clearActiveTiles}>Clear</Button>
+			<Button icon={Export16} kind="ghost" on:click={exportSong}>Export to MIDI</Button>
 		</div>
 	</div>
 {:else}
@@ -272,6 +265,8 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		gap: 0.25rem;
+		width: 100%;
 	}
 
 	#sequencer {

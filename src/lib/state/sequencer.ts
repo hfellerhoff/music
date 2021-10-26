@@ -1,3 +1,4 @@
+import { SequencerUtils } from '$lib/util/sequencer';
 import { writable } from 'svelte/store';
 import { Scale } from 'theory.js';
 
@@ -14,6 +15,7 @@ interface Sequencer {
 	activeTiles: SequencerTiles;
 	tonic: string;
 	scale: number[];
+	stringScale: string[];
 	measures: number;
 	octaves: number;
 	highlightMeasureStart: boolean;
@@ -28,32 +30,26 @@ const sequencerControlsDefaults = {
 };
 
 const sequencerDefaults: Sequencer = {
-	isLoaded: false,
-	rows: [],
-	columns: [],
+	isLoaded: true,
+	stringScale: SequencerUtils.getScale(
+		sequencerControlsDefaults.tonic,
+		sequencerControlsDefaults.scale,
+		sequencerControlsDefaults.measures
+	),
+	rows: SequencerUtils.getRows(
+		SequencerUtils.getScale(
+			sequencerControlsDefaults.tonic,
+			sequencerControlsDefaults.scale,
+			sequencerControlsDefaults.measures
+		)
+	),
+	columns: SequencerUtils.getColumns(sequencerControlsDefaults.measures),
 	activeTiles: {},
 	...sequencerControlsDefaults
 };
 
-export const sequencer = writable<Sequencer>(sequencerDefaults);
+export const sequencer = writable<Sequencer>({ ...sequencerDefaults });
+
 export const initSequencer = (): void => {
-	const localSequencer = localStorage.getItem('sequencer');
-	if (localSequencer) {
-		sequencer.set({
-			...JSON.parse(localSequencer),
-			isLoaded: true
-		});
-	} else {
-		sequencer.update((value) => ({
-			...value,
-			isLoaded: true
-		}));
-	}
-	sequencer.subscribe((value) => (localStorage.sequencer = JSON.stringify(value)));
-};
-export const resetSequencerControls = (): void => {
-	sequencer.update((value) => ({
-		...value,
-		...sequencerControlsDefaults
-	}));
+	sequencer.set({ ...sequencerDefaults });
 };
