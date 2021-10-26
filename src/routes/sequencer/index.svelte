@@ -186,16 +186,12 @@
 				<h6>{scale[row]}</h6>
 			</div>
 			{#each columns as column}
-				<ClickableTile
-					style={`width: 0.5rem; height: 0.5rem; min-width: 0.5rem; min-height: 0.5rem; ${
-						activeTiles[column][row]
-							? `background: ${activeColor}; ${
-									playingColumn === column && `background: ${playingColor};`
-							  }`
-							: $sequencerControls.highlightMeasureStart &&
-							  (column - 1) % 4 === 0 &&
-							  `background: #2E2E2E;`
-					}`}
+				<div
+					class="sequencer-tile"
+					class:sequencer-tile--measure-start={$sequencerControls.highlightMeasureStart &&
+						(column - 1) % 4 === 0}
+					class:sequencer-tile--active={activeTiles[column][row]}
+					class:sequencer-tile--playing={activeTiles[column][row] && playingColumn === column}
 					on:click={() => toggleTile(column, row)}
 					on:mouseover={() => {
 						if (isMouseDown) toggleTile(column, row);
@@ -217,6 +213,29 @@
 <style>
 	h2 {
 		margin-bottom: 2rem;
+	}
+
+	.sequencer-tile {
+		width: 2rem;
+		height: 2rem;
+		min-width: 0.5rem;
+		min-height: 0.5rem;
+
+		background: #262626;
+
+		transition: 0.2s all;
+	}
+
+	.sequencer-tile--measure-start {
+		background: #2e2e2e;
+	}
+
+	.sequencer-tile--active {
+		background: #f4f4f4;
+	}
+
+	.sequencer-tile--playing {
+		background: #1062fe;
 	}
 
 	#container {
