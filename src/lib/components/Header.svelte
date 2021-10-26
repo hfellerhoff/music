@@ -16,6 +16,10 @@
 			<HeaderPanelLinks>
 				<HeaderPanelDivider>Music Creation Tools</HeaderPanelDivider>
 				<HeaderPanelLink href="/sequencer">Sequencer</HeaderPanelLink>
+				<HeaderPanelDivider>Henry Fellerhoff</HeaderPanelDivider>
+				<HeaderPanelLink href="https://www.henryfellerhoff.com">henryfellerhoff.com</HeaderPanelLink
+				>
+				<HeaderPanelLink href="https://ko-fi.com/henryfellerhoff">Buy Me a Coffee</HeaderPanelLink>
 				<!-- <HeaderPanelDivider>Sample Packs by Modern.fm</HeaderPanelDivider>
 				<HeaderPanelLink
 					target="_blank"
