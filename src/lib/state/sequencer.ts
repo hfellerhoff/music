@@ -43,6 +43,11 @@ export const initSequencer = (): void => {
 			...JSON.parse(localSequencer),
 			isLoaded: true
 		});
+	} else {
+		sequencer.update((value) => ({
+			...value,
+			isLoaded: true
+		}));
 	}
 	sequencer.subscribe((value) => (localStorage.sequencer = JSON.stringify(value)));
 };
