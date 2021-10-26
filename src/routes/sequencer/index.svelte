@@ -51,11 +51,25 @@
 	};
 	// clearActiveTiles();
 
+	let isMouseDown = false;
+	let mouseDownOnActiveTile: boolean | undefined = undefined;
+
 	const toggleTile = (column: number, row: number) => {
-		if (!changedTiles[column][row]) {
+		if (!isMouseDown) return;
+
+		if (mouseDownOnActiveTile === undefined) {
+			mouseDownOnActiveTile = activeTiles[column][row];
+		}
+
+		if (!changedTiles[column][row] && activeTiles[column][row] === mouseDownOnActiveTile) {
 			activeTiles[column][row] = !activeTiles[column][row];
 			changedTiles[column][row] = true;
 		}
+	};
+
+	const mouseDownTile = (column: number, row: number) => {
+		if (activeTiles[column][row]) mouseDownOnActiveTile = true;
+		toggleTile(column, row);
 	};
 
 	let playingColumn = 0;
@@ -100,7 +114,6 @@
 		}
 	};
 
-	let isMouseDown = false;
 	onMount(() => {
 		Tone.loaded().then(() => {
 			loaded = true;
@@ -119,6 +132,7 @@
 		});
 		window.addEventListener('mouseup', (e) => {
 			isMouseDown = false;
+			mouseDownOnActiveTile = undefined;
 		});
 	});
 
@@ -193,12 +207,9 @@
 					class:sequencer-tile--active={activeTiles[column][row]}
 					class:sequencer-tile--playing={activeTiles[column][row] && playingColumn === column}
 					on:click={() => toggleTile(column, row)}
-					on:mouseover={() => {
-						if (isMouseDown) toggleTile(column, row);
-					}}
-					on:mouseleave={() => {
-						if (isMouseDown) toggleTile(column, row);
-					}}
+					on:mouseover={() => toggleTile(column, row)}
+					on:mouseleave={() => toggleTile(column, row)}
+					on:focus={() => toggleTile(column, row)}
 				/>
 			{/each}
 		{/each}
@@ -216,12 +227,21 @@
 	}
 
 	.sequencer-tile {
-		width: '100%';
-		height: '100%';
+		width: 2rem;
+		height: 2rem;
 
 		background: #262626;
 
+		-webkit-user-select: none;
+		-webkit-user-drag: none;
+		-webkit-app-region: no-drag;
+
 		transition: 0.2s all;
+		cursor: pointer;
+	}
+
+	.sequencer-tile:hover {
+		background: #333333;
 	}
 
 	.sequencer-tile--measure-start {
@@ -230,6 +250,10 @@
 
 	.sequencer-tile--active {
 		background: #f4f4f4;
+	}
+
+	.sequencer-tile--active:hover {
+		background: #ffffff;
 	}
 
 	.sequencer-tile--playing {

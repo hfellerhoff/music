@@ -25,6 +25,9 @@ export const SequencerUtils = {
 		for (let o = 0; o < octaves; o++) {
 			compositeScale.push(baseScale.getStringArray());
 			baseScale.notes.forEach((note) => note.raiseOctave());
+
+			// Prevent doubling of root note
+			if (o === 0) baseScale.notes.splice(0, 1);
 		}
 		compositeScale = compositeScale.flat();
 		return compositeScale;
