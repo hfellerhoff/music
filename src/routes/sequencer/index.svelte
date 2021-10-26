@@ -216,10 +216,8 @@
 	}
 
 	.sequencer-tile {
-		width: 2rem;
-		height: 2rem;
-		min-width: 0.5rem;
-		min-height: 0.5rem;
+		width: '100%';
+		height: '100%';
 
 		background: #262626;
 
