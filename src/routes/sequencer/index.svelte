@@ -3,53 +3,48 @@
 	import * as Tone from 'tone';
 	import FileSaver from 'file-saver';
 	import { Note, Scale, Song } from 'theory.js';
-	import { Button, ClickableTile, ToastNotification } from 'carbon-components-svelte';
+	import { Button, ClickableTile, Loading, ToastNotification } from 'carbon-components-svelte';
 
 	import { createInstruments, instruments } from '$lib/state/instruments';
 	import SequencerControls from '$lib/components/SequencerControls.svelte';
-	import { sequencerControls } from '$lib/state/sequencer';
+	import { initSequencer, sequencer } from '$lib/state/sequencer';
 	import { SequencerUtils } from '$lib/util/sequencer';
 
-	// let lowerTonic = new Note($sequencerControls.tonic);
+	// let lowerTonic = new Note($sequencer.tonic);
 	// lowerTonic.lowerOctave();
-	// let lowerScale = new Scale(lowerTonic, $sequencerControls.scale);
+	// let lowerScale = new Scale(lowerTonic, $sequencer.scale);
 
-	// let higherTonic = new Note($sequencerControls.tonic);
+	// let higherTonic = new Note($sequencer.tonic);
 	// higherTonic.raiseOctave();
-	// let higherScale = new Scale(higherTonic, $sequencerControls.scale);
+	// let higherScale = new Scale(higherTonic, $sequencer.scale);
 
-	let activeTiles = {};
+	$sequencer.activeTiles = {};
 	let changedTiles = {};
 
-	let scale = SequencerUtils.getScale(
-		$sequencerControls.tonic,
-		$sequencerControls.scale,
-		$sequencerControls.octaves
-	);
-	let columns: number[] = SequencerUtils.getColumns($sequencerControls.measures);
-	let rows: number[] = SequencerUtils.getRows(scale);
+	let scale = SequencerUtils.getScale($sequencer.tonic, $sequencer.scale, $sequencer.octaves);
+	$sequencer.columns = SequencerUtils.getColumns($sequencer.measures);
+	$sequencer.rows = SequencerUtils.getRows(scale);
 
 	const refreshActiveTiles = () => {
-		const previousActiveTiles = { ...activeTiles };
-		activeTiles = {};
-		columns.forEach((column) => {
-			activeTiles[column] = {};
+		const previousActiveTiles = { ...$sequencer.activeTiles };
+		$sequencer.activeTiles = {};
+		$sequencer.columns.forEach((column) => {
+			$sequencer.activeTiles[column] = {};
 			const previousColumn = previousActiveTiles[column] || {};
-			rows.forEach((row) => {
-				activeTiles[column][row] = previousColumn[row] || false;
+			$sequencer.rows.forEach((row) => {
+				$sequencer.activeTiles[column][row] = previousColumn[row] || false;
 			});
 		});
 	};
 
 	const clearActiveTiles = () => {
-		columns.forEach((column) => {
-			activeTiles[column] = {};
-			rows.forEach((row) => {
-				activeTiles[column][row] = false;
+		$sequencer.columns.forEach((column) => {
+			$sequencer.activeTiles[column] = {};
+			$sequencer.rows.forEach((row) => {
+				$sequencer.activeTiles[column][row] = false;
 			});
 		});
 	};
-	// clearActiveTiles();
 
 	let isMouseDown = false;
 	let mouseDownOnActiveTile: boolean | undefined = undefined;
@@ -58,18 +53,16 @@
 		if (!isMouseDown) return;
 
 		if (mouseDownOnActiveTile === undefined) {
-			mouseDownOnActiveTile = activeTiles[column][row];
+			mouseDownOnActiveTile = $sequencer.activeTiles[column][row];
 		}
 
-		if (!changedTiles[column][row] && activeTiles[column][row] === mouseDownOnActiveTile) {
-			activeTiles[column][row] = !activeTiles[column][row];
+		if (
+			!changedTiles[column][row] &&
+			$sequencer.activeTiles[column][row] === mouseDownOnActiveTile
+		) {
+			$sequencer.activeTiles[column][row] = !$sequencer.activeTiles[column][row];
 			changedTiles[column][row] = true;
 		}
-	};
-
-	const mouseDownTile = (column: number, row: number) => {
-		if (activeTiles[column][row]) mouseDownOnActiveTile = true;
-		toggleTile(column, row);
 	};
 
 	let playingColumn = 0;
@@ -88,9 +81,9 @@
 			synth.volume.set(0.5);
 			const now = Tone.now();
 
-			columns.forEach((column) => {
-				rows.forEach((row) => {
-					if (activeTiles[column][row]) {
+			$sequencer.columns.forEach((column) => {
+				$sequencer.rows.forEach((row) => {
+					if ($sequencer.activeTiles[column][row]) {
 						const note = scale[row];
 						synth.triggerAttackRelease(note, '16n', now + column / 4);
 					}
@@ -99,7 +92,7 @@
 
 			const interval = setInterval(() => {
 				playingColumn++;
-				if (playingColumn === columns.length + 1) {
+				if (playingColumn === $sequencer.columns.length + 1) {
 					playingColumn = 0;
 					playing = false;
 					clearInterval(interval);
@@ -115,6 +108,8 @@
 	};
 
 	onMount(() => {
+		initSequencer();
+
 		Tone.loaded().then(() => {
 			loaded = true;
 			createInstruments();
@@ -123,7 +118,7 @@
 		window.addEventListener('mousedown', (e) => {
 			isMouseDown = true;
 			changedTiles = {};
-			columns.forEach((column) => {
+			$sequencer.columns.forEach((column) => {
 				changedTiles[column] = {};
 				scale.forEach((note) => {
 					changedTiles[column][note] = false;
@@ -141,7 +136,7 @@
 			tonic: 'G4'
 		});
 
-		Object.entries(activeTiles).forEach(([column, rows]) => {
+		Object.entries($sequencer.activeTiles).forEach(([column, rows]) => {
 			let activeNotes: Note[] = [];
 			Object.entries(rows).forEach(([row, isActive]) => {
 				if (isActive) {
@@ -171,13 +166,9 @@
 	const playingColor = '#1062FE';
 
 	$: {
-		scale = SequencerUtils.getScale(
-			$sequencerControls.tonic,
-			$sequencerControls.scale,
-			$sequencerControls.octaves
-		);
-		columns = SequencerUtils.getColumns($sequencerControls.measures);
-		rows = SequencerUtils.getRows(scale);
+		scale = SequencerUtils.getScale($sequencer.tonic, $sequencer.scale, $sequencer.octaves);
+		$sequencer.columns = SequencerUtils.getColumns($sequencer.measures);
+		$sequencer.rows = SequencerUtils.getRows(scale);
 
 		refreshActiveTiles();
 	}
@@ -192,34 +183,42 @@
 </svelte:head>
 
 <h2>Sequencer</h2>
-<SequencerControls />
-<div id="container">
-	<div id="sequencer" style={`grid-template-columns: repeat(${columns.length + 2}, 2rem);`}>
-		{#each rows as row}
-			<div class="sequencer-label">
-				<h6>{scale[row]}</h6>
-			</div>
-			{#each columns as column}
-				<div
-					class="sequencer-tile"
-					class:sequencer-tile--measure-start={$sequencerControls.highlightMeasureStart &&
-						(column - 1) % 4 === 0}
-					class:sequencer-tile--active={activeTiles[column][row]}
-					class:sequencer-tile--playing={activeTiles[column][row] && playingColumn === column}
-					on:click={() => toggleTile(column, row)}
-					on:mouseover={() => toggleTile(column, row)}
-					on:mouseleave={() => toggleTile(column, row)}
-					on:focus={() => toggleTile(column, row)}
-				/>
+{#if $sequencer.isLoaded}
+	<SequencerControls />
+	<div id="container">
+		<div
+			id="sequencer"
+			style={`grid-template-columns: repeat(${$sequencer.columns.length + 2}, 2rem);`}
+		>
+			{#each $sequencer.rows as row}
+				<div class="sequencer-label">
+					<h6>{scale[row]}</h6>
+				</div>
+				{#each $sequencer.columns as column}
+					<div
+						class="sequencer-tile"
+						class:sequencer-tile--measure-start={$sequencer.highlightMeasureStart &&
+							(column - 1) % 4 === 0}
+						class:sequencer-tile--active={$sequencer.activeTiles[column][row]}
+						class:sequencer-tile--playing={$sequencer.activeTiles[column][row] &&
+							playingColumn === column}
+						on:click={() => toggleTile(column, row)}
+						on:mouseover={() => toggleTile(column, row)}
+						on:mouseleave={() => toggleTile(column, row)}
+						on:focus={() => toggleTile(column, row)}
+					/>
+				{/each}
 			{/each}
-		{/each}
+		</div>
+		<div class="button-container">
+			<Button kind="secondary" on:click={clearActiveTiles}>Clear</Button>
+			<Button on:click={playSong} disabled={playing}>Play</Button>
+			<Button kind="ghost" on:click={exportSong}>Export to MIDI</Button>
+		</div>
 	</div>
-	<div class="button-container">
-		<Button kind="secondary" on:click={clearActiveTiles}>Clear</Button>
-		<Button on:click={playSong} disabled={playing}>Play</Button>
-		<Button kind="ghost" on:click={exportSong}>Export to MIDI</Button>
-	</div>
-</div>
+{:else}
+	<Loading />
+{/if}
 
 <style>
 	h2 {

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { sequencerControls } from '$lib/state/sequencer';
+	import { resetSequencerControls, sequencer } from '$lib/state/sequencer';
 
-	import { Select, SelectItem, NumberInput, Checkbox } from 'carbon-components-svelte';
+	import { Select, SelectItem, NumberInput, Checkbox, Button } from 'carbon-components-svelte';
 	import Instrument from './Instrument.svelte';
 	import { Scale } from 'theory.js';
 
@@ -10,10 +10,10 @@
 
 	const changeTonic = (value: string) => (tonic = value);
 	const changeScale = (value: string) => {
-		$sequencerControls.scale = [...value.split(',').map((v) => parseInt(v)), 12];
+		$sequencer.scale = [...value.split(',').map((v) => parseInt(v)), 12];
 	};
 
-	$: $sequencerControls.tonic = `${tonic}${octave}`;
+	$: $sequencer.tonic = `${tonic}${octave}`;
 </script>
 
 <div class="sequencer-controls">
@@ -57,9 +57,9 @@
 	</Select>
 
 	<NumberInput
-		value={$sequencerControls.measures}
+		value={$sequencer.measures}
 		label="Measures"
-		on:change={(e) => ($sequencerControls.measures = e.detail)}
+		on:change={(e) => ($sequencer.measures = e.detail)}
 	/>
 	<Instrument />
 	<NumberInput
@@ -70,9 +70,9 @@
 		max={8}
 	/>
 	<NumberInput
-		value={$sequencerControls.octaves}
+		value={$sequencer.octaves}
 		label="Number of Octaves"
-		on:change={(e) => ($sequencerControls.octaves = e.detail)}
+		on:change={(e) => ($sequencer.octaves = e.detail)}
 		min={1}
 		max={8}
 	/>
@@ -81,24 +81,10 @@
 		<Checkbox
 			labelText="Highlight Measure Start"
 			checked={true}
-			on:change={() =>
-				($sequencerControls.highlightMeasureStart = !$sequencerControls.highlightMeasureStart)}
+			on:change={() => ($sequencer.highlightMeasureStart = !$sequencer.highlightMeasureStart)}
 		/>
 	</div>
-	<!-- <div class="center-checkbox">
-		<Checkbox
-			labelText="Show Lower Octave"
-			checked={false}
-			on:change={() => ($sequencerControls.octaveBelow = !$sequencerControls.octaveBelow)}
-		/>
-	</div>
-	<div class="center-checkbox">
-		<Checkbox
-			labelText="Show Higher Octave"
-			checked={false}
-			on:change={() => ($sequencerControls.octaveAbove = !$sequencerControls.octaveAbove)}
-		/>
-	</div> -->
+	<Button kind="ghost" on:click={resetSequencerControls}>Reset to Defaults</Button>
 </div>
 
 <style>
