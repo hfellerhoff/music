@@ -69,6 +69,7 @@
 
 		try {
 			const synth = $instruments[0].synth.toDestination();
+			if ($instruments[0].name.includes("Piano")) synth.release = 1
 			synth.volume.set(0.5);
 			const now = Tone.now();
 
@@ -76,7 +77,7 @@
 				$sequencer.rows.forEach((row) => {
 					if ($sequencer.activeTiles[column][row]) {
 						const note = $sequencer.stringScale[row];
-						synth.triggerAttackRelease(note, '16n', now + column / 4);
+						synth.triggerAttackRelease(note, '8n', now + column / 4);
 					}
 				});
 			});

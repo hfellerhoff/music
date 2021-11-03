@@ -21,6 +21,16 @@ export const createInstruments = () => {
 		{
 			name: 'FM Synth',
 			synth: new Tone.PolySynth(Tone.FMSynth)
+		},
+		{
+			name: 'Piano',
+			synth: new Tone.Sampler({
+				urls: {
+					C3: 'C3.ogg',
+					C4: 'C4.ogg'
+				},
+				baseUrl: '/assets/piano/'
+			})
 		}
 	]);
 };
