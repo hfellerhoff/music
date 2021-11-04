@@ -15,6 +15,7 @@
 			<HeaderPanelLinks>
 				<HeaderPanelLink href="/">Back to Home</HeaderPanelLink>
 				<HeaderPanelDivider>Music Creation Tools</HeaderPanelDivider>
+				<HeaderPanelLink href="/play">Play</HeaderPanelLink>
 				<HeaderPanelLink href="/sequencer">Sequencer</HeaderPanelLink>
 				<HeaderPanelDivider>Henry Fellerhoff</HeaderPanelDivider>
 				<HeaderPanelLink href="https://www.henryfellerhoff.com">henryfellerhoff.com</HeaderPanelLink

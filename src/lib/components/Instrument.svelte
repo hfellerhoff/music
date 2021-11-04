@@ -6,7 +6,7 @@
 	const changeInstrument = (name: string) => {
 		const index = $instruments.findIndex((inst) => inst.name === name);
 		const instrument = $instruments.splice(index, 1)[0];
-		$instruments.unshift(instrument);
+		$instruments = [instrument, ...$instruments];
 	};
 </script>
 

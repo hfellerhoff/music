@@ -3,13 +3,32 @@ import * as Tone from 'tone';
 
 interface Instrument {
 	name: string;
-	synth: any;
+	synth: Tone.PolySynth | Tone.Sampler;
 }
 
 export const instruments = writable<Instrument[]>([]);
 
-export const createInstruments = () => {
+const startOctave = 2;
+const endOctave = 6;
+const notes = ['C'];
+const pianoNotes = [];
+
+for (let o = startOctave; o <= endOctave; o++) {
+	notes.forEach((note) => pianoNotes.push(`${note}${o}`));
+}
+
+export const createInstruments = (): void => {
 	instruments.set([
+		{
+			name: 'Piano',
+			synth: new Tone.Sampler({
+				urls: pianoNotes.reduce((acc, cur) => {
+					acc[cur] = `${cur}.ogg`;
+					return acc;
+				}, {}),
+				baseUrl: '/assets/piano/'
+			})
+		},
 		{
 			name: 'Mono Synth',
 			synth: new Tone.PolySynth(Tone.MonoSynth)
@@ -21,16 +40,6 @@ export const createInstruments = () => {
 		{
 			name: 'FM Synth',
 			synth: new Tone.PolySynth(Tone.FMSynth)
-		},
-		{
-			name: 'Piano',
-			synth: new Tone.Sampler({
-				urls: {
-					C3: 'C3.ogg',
-					C4: 'C4.ogg'
-				},
-				baseUrl: '/assets/piano/'
-			})
 		}
 	]);
 };
