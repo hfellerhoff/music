@@ -17,7 +17,7 @@
 	const octaves = [1, 2, 3, 4, 5, 6];
 
 	let activeNotes: Record<string, boolean> = {};
-	let activeClickedNotes: Record<string, boolean> = {};
+	let sustainedNotes: Record<string, boolean> = {};
 
 	let isMouseDown = false;
 	let synth: Tone.PolySynth<Tone.Synth<Tone.SynthOptions>> | Tone.Sampler;
@@ -43,7 +43,7 @@
 				...dict
 			};
 		}, {} as Record<string, boolean>);
-		activeClickedNotes = { ...activeNotes };
+		sustainedNotes = { ...activeNotes };
 
 		window.addEventListener('mousedown', (e) => {
 			isMouseDown = true;
@@ -53,20 +53,41 @@
 		});
 	});
 
+	let isSustained = false;
 	const onMessage = (message: MIDIMessage) => {
+		const type = message[0];
 		const note = new Scale(new Note(message[1]), []).getStringArray()[0];
 		const velocity = message[2] / 127;
 
 		if (synth) {
-			switch (message[0]) {
+			switch (type) {
+				// Note On
 				case 144:
-					synth.triggerAttack(note, Tone.now(), velocity);
+					synth.triggerAttack(note, Tone.immediate(), velocity);
 					activeNotes[note] = true;
+					if (isSustained) sustainedNotes[note] = true;
 					break;
+				// Note Off
 				case 128:
-					synth.triggerRelease(note, Tone.now());
+					if (!sustainedNotes[note]) {
+						synth.triggerRelease(note, Tone.immediate());
+					}
 					activeNotes[note] = false;
 					break;
+				// Sustain
+				case 176:
+					if (message[2] === 127) {
+						isSustained = true;
+						sustainedNotes = { ...activeNotes };
+					} else {
+						Object.entries(sustainedNotes).forEach(([n, isPlaying]) => {
+							if (isPlaying && !activeNotes[n]) {
+								synth.triggerRelease(n, Tone.immediate());
+							}
+							sustainedNotes[n] = false;
+						});
+						isSustained = false;
+					}
 				default:
 					break;
 			}
@@ -74,10 +95,10 @@
 	};
 
 	const playNote = (note: string) => {
-		onMessage([144, new Note(note).midi, 127]);
+		onMessage([144, new Note(note).midi, 100]);
 	};
 	const stopNote = (note: string) => {
-		onMessage([128, new Note(note).midi, 127]);
+		onMessage([128, new Note(note).midi, 100]);
 	};
 </script>
 
