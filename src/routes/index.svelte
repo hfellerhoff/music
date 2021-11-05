@@ -3,7 +3,7 @@
 </script>
 
 <svelte:head>
-	<title>Create Music | Henry Fellerhoff</title>
+	<title>Browser Music by Henry Fellerhoff</title>
 </svelte:head>
 
 <div>

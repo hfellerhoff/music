@@ -9,7 +9,7 @@
 	} from 'carbon-components-svelte';
 </script>
 
-<Header company="Henry Fellerhoff" platformName="Music">
+<Header company="Broswer" platformName="Music">
 	<HeaderUtilities>
 		<HeaderAction transition={{ duration: 200 }}>
 			<HeaderPanelLinks>

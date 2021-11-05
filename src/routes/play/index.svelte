@@ -102,6 +102,10 @@
 	};
 </script>
 
+<svelte:head>
+	<title>Play | Broswer Music by Henry Fellerhoff</title>
+</svelte:head>
+
 <MIDI {onMessage}>
 	<Instrument />
 </MIDI>

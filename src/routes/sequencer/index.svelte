@@ -173,7 +173,7 @@
 {/if}
 
 <svelte:head>
-	<title>Sequencer | Henry Fellerhoff</title>
+	<title>Sequencer | Broswer Music by Henry Fellerhoff</title>
 </svelte:head>
 
 <h2>Sequencer</h2>
