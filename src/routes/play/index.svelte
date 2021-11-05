@@ -14,7 +14,7 @@
 		else offset += 3;
 		return offset;
 	};
-	const octaves = [1, 2, 3, 4, 5, 6];
+	const octaves = [2, 3, 4, 5, 6];
 
 	let activeNotes: Record<string, boolean> = {};
 	let sustainedNotes: Record<string, boolean> = {};

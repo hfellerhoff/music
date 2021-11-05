@@ -1512,10 +1512,10 @@ text-table@^0.2.0:
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
   integrity sha1-f17oI66AUgfACvLfSoTsP8+lcLQ=
 
-theory.js@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/theory.js/-/theory.js-1.2.0.tgz#254d5ece5fb4b7871505f602616d5d34ce8dd9b9"
-  integrity sha512-39Cz0Pk8J7OHkmpGj00MtIhLRtRUcar5NGmIedZLgSQwOS2Odj6D9n4i0Ti3r83YIb3Cf+ZIBoOsYgF8jmMudw==
+theory.js@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/theory.js/-/theory.js-1.2.1.tgz#cf0c2ad85d0eb724292ef6739a010366ce150962"
+  integrity sha512-nIypzO+78uR6SE3DIbiePJttIvEjydY4oS49zKshkbE2vtPZgd5v7S+IzKkAYKaOMUGVwQDKgmPCCP++OiO+4w==
   dependencies:
     lodash "^4.17.21"
 
