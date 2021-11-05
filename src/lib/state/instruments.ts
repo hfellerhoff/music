@@ -42,7 +42,10 @@ export const createInstruments = (): void => {
 	const all = [
 		{
 			name: 'Piano',
-			synth: new Tone.Sampler(initSampler('/assets/piano/', ['C'], 2, 6))
+			synth: new Tone.Sampler({
+				...initSampler('/assets/piano/', ['C'], 2, 6),
+				release: 1
+			})
 		},
 		{
 			name: 'Mono Synth',

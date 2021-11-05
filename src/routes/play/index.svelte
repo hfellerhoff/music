@@ -17,7 +17,9 @@
 	const octaves = [1, 2, 3, 4, 5, 6];
 
 	let activeNotes: Record<string, boolean> = {};
+	let activeClickedNotes: Record<string, boolean> = {};
 
+	let isMouseDown = false;
 	let synth: Tone.PolySynth<Tone.Synth<Tone.SynthOptions>> | Tone.Sampler;
 	onMount(() => {
 		Tone.loaded().then(() => {
@@ -41,6 +43,14 @@
 				...dict
 			};
 		}, {} as Record<string, boolean>);
+		activeClickedNotes = { ...activeNotes };
+
+		window.addEventListener('mousedown', (e) => {
+			isMouseDown = true;
+		});
+		window.addEventListener('mouseup', (e) => {
+			isMouseDown = false;
+		});
 	});
 
 	const onMessage = (message: MIDIMessage) => {
@@ -62,6 +72,13 @@
 			}
 		}
 	};
+
+	const playNote = (note: string) => {
+		onMessage([144, new Note(note).midi, 127]);
+	};
+	const stopNote = (note: string) => {
+		onMessage([128, new Note(note).midi, 127]);
+	};
 </script>
 
 <MIDI {onMessage}>
@@ -77,10 +94,23 @@
 					class="piano-tile piano-tile--black"
 					class:active={activeNotes[key + octave]}
 					style={`--offset: ${getOffset(key)}rem`}
+					on:mousedown={() => playNote(key + octave)}
+					on:mouseenter={() => isMouseDown && playNote(key + octave)}
+					on:focus={() => playNote(key + octave)}
+					on:mouseleave={() => stopNote(key + octave)}
+					on:mouseup={() => stopNote(key + octave)}
 				/>
 			{:else}
 				<!-- white key -->
-				<div class="piano-tile" class:active={activeNotes[key + octave]}>
+				<div
+					class="piano-tile"
+					class:active={activeNotes[key + octave]}
+					on:mousedown={() => playNote(key + octave)}
+					on:mouseenter={() => isMouseDown && playNote(key + octave)}
+					on:focus={() => playNote(key + octave)}
+					on:mouseleave={() => stopNote(key + octave)}
+					on:mouseup={() => stopNote(key + octave)}
+				>
 					<span>{key}{octave}</span>
 				</div>
 			{/if}
