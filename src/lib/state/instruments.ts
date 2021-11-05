@@ -6,7 +6,13 @@ interface Instrument {
 	synth: Tone.PolySynth | Tone.Sampler;
 }
 
-export const instruments = writable<Instrument[]>([]);
+export const instruments = writable<{
+	selected: Instrument | undefined;
+	all: Instrument[];
+}>({
+	selected: undefined,
+	all: []
+});
 
 const initSampler = (
 	baseUrl,
@@ -33,7 +39,7 @@ const initSampler = (
 };
 
 export const createInstruments = (): void => {
-	instruments.set([
+	const all = [
 		{
 			name: 'Piano',
 			synth: new Tone.Sampler(initSampler('/assets/piano/', ['C'], 2, 6))
@@ -50,5 +56,10 @@ export const createInstruments = (): void => {
 			name: 'FM Synth',
 			synth: new Tone.PolySynth(Tone.FMSynth)
 		}
-	]);
+	];
+
+	instruments.set({
+		selected: all[0],
+		all
+	});
 };

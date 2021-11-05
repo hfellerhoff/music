@@ -47,6 +47,8 @@
 					input = inputIterator.next;
 				}
 
+				if (inputs.length > 0) inputID = inputs[0].id;
+
 				access.onstatechange = function (e) {
 					// Print information about the (dis)connected MIDI controller
 					// console.log(e.port.name, e.port.manufacturer, e.port.state);
@@ -93,8 +95,10 @@
 			<p>Change to Chrome, Edge, or Opera to connect a MIDI controller.</p>
 		{:else}
 			{#if !isLoadingInputs}
-				<Select on:input={handleSelect} labelText="MIDI Input" selected="none">
-					<SelectItem value="0" text="None" />
+				<Select value={inputID} on:input={handleSelect} labelText="MIDI Input" selected="none">
+					{#if inputs.length === 0}
+						<SelectItem value="0" text="None" />
+					{/if}
 					{#each inputs as input}
 						<SelectItem value={`${input.id}`} text={input.name} />
 					{/each}

@@ -4,19 +4,21 @@
 	import { Select, SelectItem } from 'carbon-components-svelte';
 
 	const changeInstrument = (name: string) => {
-		const index = $instruments.findIndex((inst) => inst.name === name);
-		const instrument = $instruments.splice(index, 1)[0];
-		$instruments = [instrument, ...$instruments];
+		const index = $instruments.all.findIndex((inst) => inst.name === name);
+		instruments.update((inst) => ({
+			...inst,
+			selected: inst.all[index]
+		}));
 	};
 </script>
 
-{#if $instruments && $instruments.length > 0}
+{#if $instruments && $instruments.all.length > 0}
 	<Select
 		labelText="Instrument"
-		selected={$instruments[0].name}
+		selected={$instruments.selected.name}
 		on:change={(e) => changeInstrument(e.detail)}
 	>
-		{#each $instruments as instrument}
+		{#each $instruments.all as instrument}
 			<SelectItem value={instrument.name} text={instrument.name} />
 		{/each}
 	</Select>

@@ -69,8 +69,8 @@
 		playing = true;
 
 		try {
-			const instrument = $instruments[0].synth.toDestination();
-			if ($instruments[0].name.includes('Piano')) (instrument as Tone.Sampler).release = 1;
+			const instrument = $instruments.selected.synth.toDestination();
+			if ($instruments.selected.name.includes('Piano')) (instrument as Tone.Sampler).release = 1;
 			instrument.volume.set(0.5 as RecursivePartial<Tone.ParamOptions<'decibels'>>);
 			const now = Tone.now();
 
