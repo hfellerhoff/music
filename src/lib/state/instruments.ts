@@ -8,26 +8,35 @@ interface Instrument {
 
 export const instruments = writable<Instrument[]>([]);
 
-const startOctave = 2;
-const endOctave = 6;
-const notes = ['C'];
-const pianoNotes = [];
+const initSampler = (
+	baseUrl,
+	notes,
+	startOctave,
+	endOctave
+): {
+	urls: Record<string, string>;
+	baseUrl: string;
+} => {
+	const pianoNotes = [];
 
-for (let o = startOctave; o <= endOctave; o++) {
-	notes.forEach((note) => pianoNotes.push(`${note}${o}`));
-}
+	for (let o = startOctave; o <= endOctave; o++) {
+		notes.forEach((note) => pianoNotes.push(`${note}${o}`));
+	}
+
+	return {
+		urls: pianoNotes.reduce((acc, cur) => {
+			acc[cur] = `${cur}.ogg`;
+			return acc;
+		}, {}),
+		baseUrl
+	};
+};
 
 export const createInstruments = (): void => {
 	instruments.set([
 		{
 			name: 'Piano',
-			synth: new Tone.Sampler({
-				urls: pianoNotes.reduce((acc, cur) => {
-					acc[cur] = `${cur}.ogg`;
-					return acc;
-				}, {}),
-				baseUrl: '/assets/piano/'
-			})
+			synth: new Tone.Sampler(initSampler('/assets/piano/', ['C'], 2, 6))
 		},
 		{
 			name: 'Mono Synth',

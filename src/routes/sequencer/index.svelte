@@ -13,6 +13,7 @@
 	import Play16 from 'carbon-icons-svelte/lib/Play16';
 	import Erase16 from 'carbon-icons-svelte/lib/Erase16';
 	import Export16 from 'carbon-icons-svelte/lib/Export16';
+	import type { RecursivePartial } from 'tone/build/esm/core/util/Interface';
 
 	let changedTiles = {};
 
@@ -40,8 +41,8 @@
 	let isMouseDown = false;
 	let mouseDownOnActiveTile: boolean | undefined = undefined;
 
-	const toggleTile = (column: number, row: number) => {
-		if (!isMouseDown) return;
+	const toggleTile = (column: number, row: number, override = false) => {
+		if (!isMouseDown && !override) return;
 
 		if (mouseDownOnActiveTile === undefined) {
 			mouseDownOnActiveTile = $sequencer.activeTiles[column][row];
@@ -68,16 +69,16 @@
 		playing = true;
 
 		try {
-			const synth = $instruments[0].synth.toDestination();
-			if ($instruments[0].name.includes("Piano")) synth.release = 1
-			synth.volume.set(0.5);
+			const instrument = $instruments[0].synth.toDestination();
+			if ($instruments[0].name.includes('Piano')) (instrument as Tone.Sampler).release = 1;
+			instrument.volume.set(0.5 as RecursivePartial<Tone.ParamOptions<'decibels'>>);
 			const now = Tone.now();
 
 			$sequencer.columns.forEach((column) => {
 				$sequencer.rows.forEach((row) => {
 					if ($sequencer.activeTiles[column][row]) {
 						const note = $sequencer.stringScale[row];
-						synth.triggerAttackRelease(note, '8n', now + column / 4);
+						instrument.triggerAttackRelease(note, '8n', now + column / 4);
 					}
 				});
 			});
@@ -196,7 +197,7 @@
 						class:sequencer-tile--active={$sequencer.activeTiles[column][row]}
 						class:sequencer-tile--playing={$sequencer.activeTiles[column][row] &&
 							playingColumn === column}
-						on:click={() => toggleTile(column, row)}
+						on:click={() => toggleTile(column, row, true)}
 						on:mouseover={() => toggleTile(column, row)}
 						on:mouseleave={() => toggleTile(column, row)}
 						on:focus={() => toggleTile(column, row)}
